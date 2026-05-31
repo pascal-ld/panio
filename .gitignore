@@ -1,0 +1,28 @@
+# Dependencies
+/backend/vendor/
+/frontend/node_modules/
+/frontend/.next/
+
+# Environment
+.env
+.env.prod
+.env.local
+.env.*.local
+/backend/.env.local
+/backend/.env.local.php
+/backend/.env.*.local.php
+
+# JWT keys (generate locally)
+/backend/config/jwt/*.pem
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Symfony
+/backend/var/
+
+# Logs
+*.log

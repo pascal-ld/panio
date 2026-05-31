@@ -1,0 +1,25 @@
+{
+  "name": "Panio",
+  "short_name": "Panio",
+  "description": "Gestion des paniers maraîchers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8faf6",
+  "theme_color": "#2d6a4f",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

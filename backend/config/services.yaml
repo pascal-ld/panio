@@ -1,0 +1,60 @@
+parameters:
+    product_upload_dir: '%kernel.project_dir%/public/uploads/products'
+    producer_upload_dir: '%kernel.project_dir%/public/uploads/producers'
+    app.frontend_url: '%env(APP_FRONTEND_URL)%'
+    app.backend_url: '%env(APP_BACKEND_URL)%'
+    app.mailer_from: '%env(MAILER_FROM)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\ProductPhotoUploader:
+        arguments:
+            $uploadDirectory: '%product_upload_dir%'
+
+    App\Service\ProducerPhotoUploader:
+        arguments:
+            $uploadDirectory: '%producer_upload_dir%'
+
+    App\Service\AccountVerificationMailer:
+        arguments:
+            $frontendUrl: '%app.frontend_url%'
+            $mailerFrom: '%app.mailer_from%'
+
+    App\Service\AccountInvitationMailer:
+        arguments:
+            $frontendUrl: '%app.frontend_url%'
+            $mailerFrom: '%app.mailer_from%'
+
+    App\Service\OrderPreparedMailer:
+        arguments:
+            $frontendUrl: '%app.frontend_url%'
+            $backendUrl: '%app.backend_url%'
+            $mailerFrom: '%app.mailer_from%'
+
+    App\Service\OrderAbsentMailer:
+        arguments:
+            $frontendUrl: '%app.frontend_url%'
+            $backendUrl: '%app.backend_url%'
+            $mailerFrom: '%app.mailer_from%'
+
+    App\Service\OrderProducerBroadcastMailer:
+        arguments:
+            $frontendUrl: '%app.frontend_url%'
+            $mailerFrom: '%app.mailer_from%'
+
+    App\Security\UserChecker:
+        tags:
+            - { name: security.user_checker }
+
+    App\Security\VerifiedUserAuthenticationSuccessHandler:
+        arguments:
+            $lexikHandler: '@lexik_jwt_authentication.handler.authentication_success'

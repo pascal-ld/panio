@@ -1,0 +1,58 @@
+security:
+    role_hierarchy:
+        ROLE_SUPER_ADMIN: [ROLE_PRODUCTEUR, ROLE_CLIENT]
+        ROLE_PRODUCTEUR: [ROLE_CLIENT]
+
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login
+                username_path: email
+                password_path: password
+                success_handler: App\Security\VerifiedUserAuthenticationSuccessHandler
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+    access_control:
+        # Visiteur : routes publiques sans JWT
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/set-password, roles: PUBLIC_ACCESS }
+        - { path: ^/api/health, roles: PUBLIC_ACCESS }
+        # Super admin : préfixe réservé aux futures routes d'administration
+        - { path: ^/api/admin, roles: ROLE_SUPER_ADMIN }
+        # Producteur : gestion des produits et commandes
+        - { path: ^/api/producteur, roles: ROLE_PRODUCTEUR }
+        # Client : boutique et préférences
+        - { path: ^/api/client, roles: ROLE_CLIENT }
+        # Routes API authentifiées (client, producteur, super admin)
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

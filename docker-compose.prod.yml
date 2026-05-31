@@ -1,0 +1,25 @@
+services:
+  panio-backend:
+    restart: unless-stopped
+    volumes:
+      - panio_uploads:/var/www/html/public/uploads
+      - ./backend/config/jwt:/var/www/html/config/jwt:ro
+    labels:
+      - traefik.http.routers.panio-back.tls=true
+      - traefik.http.routers.panio-back.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
+
+  panio-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    image: panio-frontend:latest
+    restart: unless-stopped
+    command: npm start
+    labels:
+      - traefik.http.routers.panio-front.tls=true
+      - traefik.http.routers.panio-front.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
+
+volumes:
+  panio_uploads:

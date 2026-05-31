@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="96" viewBox="0 0 320 96" fill="none">
+  <rect width="320" height="96" rx="16" fill="#F3FBF6"/>
+  <circle cx="48" cy="48" r="26" fill="#2D6A4F"/>
+  <path d="M48 26C40 34 38 44 42 54C46 48 52 44 60 42C58 34 54 29 48 26Z" fill="#B7E4C7"/>
+  <path d="M35 58C44 56 52 58 59 64C50 68 42 68 35 58Z" fill="#95D5B2"/>
+  <text x="88" y="58" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#1B4332">Panio</text>
+</svg>

@@ -1,0 +1,47 @@
+services:
+  panio-mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${DOCKER_NETWORK}
+      - traefik.http.routers.panio-mail.rule=Host(`${MAIL_HOST}`)
+      - traefik.http.routers.panio-mail.entrypoints=${TRAEFIK_ENTRYPOINT}
+      - traefik.http.routers.panio-mail.service=panio-mail
+      - traefik.http.services.panio-mail.loadbalancer.server.port=8025
+    networks:
+      - lino
+
+  panio-phpmyadmin:
+    image: phpmyadmin:5
+    environment:
+      PMA_HOST: panio-mariadb
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      panio-mariadb:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${DOCKER_NETWORK}
+      - traefik.http.routers.panio-pma.rule=Host(`${PMA_HOST}`)
+      - traefik.http.routers.panio-pma.entrypoints=${TRAEFIK_ENTRYPOINT}
+      - traefik.http.routers.panio-pma.service=panio-pma
+      - traefik.http.services.panio-pma.loadbalancer.server.port=80
+    networks:
+      - lino
+
+  panio-backend:
+    volumes:
+      - ./backend:/var/www/html
+
+  panio-frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- -H 0.0.0.0"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_MAIL_URL: ${NEXT_PUBLIC_MAIL_URL}
+    volumes:
+      - ./frontend:/app
