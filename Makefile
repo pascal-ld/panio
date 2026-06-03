@@ -98,8 +98,8 @@ health-local: check-env ## Teste /api/health dans le conteneur backend (sans Tra
 shell-backend: check-env ## Shell dans le conteneur backend
 	$(COMPOSE) exec $(BACKEND) bash
 
-shell-db: check-env ## Client MariaDB
-	$(COMPOSE) exec $(DB) mariadb -u$$(grep '^MYSQL_USER=' $(ENV_FILE) | cut -d= -f2) -p$$(grep '^MYSQL_PASSWORD=' $(ENV_FILE) | cut -d= -f2) $$(grep '^MYSQL_DATABASE=' $(ENV_FILE) | cut -d= -f2)
+shell-db: check-env ## Client MariaDB (utilise MYSQL_* du conteneur)
+	$(COMPOSE) exec $(DB) sh -c 'mariadb -u"$$MYSQL_USER" -p"$$MYSQL_PASSWORD" "$$MYSQL_DATABASE"'
 
 # --- Dev local ---
 
