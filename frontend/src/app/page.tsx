@@ -2,23 +2,17 @@
 
 import Link from "next/link";
 import { PanioLogo } from "@/components/brand/PanioLogo";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { checkApiHealth, fetchMe, type MeResponse } from "@/lib/api";
+import { fetchMe, type MeResponse } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { getHomePath, resolveAppRole } from "@/lib/roles";
 
 export default function HomePage() {
   const router = useRouter();
-  const [apiStatus, setApiStatus] = useState<"loading" | "ok" | "error">("loading");
   const [user, setUser] = useState<MeResponse | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
-
-  useEffect(() => {
-    checkApiHealth()
-      .then(() => setApiStatus("ok"))
-      .catch(() => setApiStatus("error"));
-  }, []);
 
   useEffect(() => {
     if (!getToken()) {
@@ -48,7 +42,7 @@ export default function HomePage() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 p-6">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 p-6">
       <header className="text-center">
         <div className="mx-auto mb-4 flex justify-center">
           <PanioLogo size={96} priority />
@@ -61,6 +55,8 @@ export default function HomePage() {
           Paniers maraîchers — connectez-vous selon votre profil.
         </p>
       </header>
+
+      <InstallAppButton />
 
       {!user && (
         <div className="flex flex-col items-center gap-3">
@@ -78,18 +74,6 @@ export default function HomePage() {
           </Link>
         </div>
       )}
-
-      <section
-        className="w-full max-w-md rounded-2xl border border-primary/15 bg-white p-6 shadow-sm"
-        aria-live="polite"
-      >
-        <h2 className="text-sm font-semibold text-foreground/60">État de l&apos;API</h2>
-        <p className="mt-2 text-lg font-medium">
-          {apiStatus === "loading" && "Connexion…"}
-          {apiStatus === "ok" && "API disponible"}
-          {apiStatus === "error" && "API indisponible"}
-        </p>
-      </section>
     </main>
   );
 }
