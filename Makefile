@@ -15,7 +15,7 @@ DB       := panio-mariadb
 
 .PHONY: help check-env init deploy update up down restart build pull ps logs \
         logs-backend logs-frontend logs-db migrate migrate-status cache-clear cache-warm \
-        console jwt health shell-backend shell-db dev-up dev-down dev-logs
+        console health shell-backend shell-db dev-up dev-down dev-logs
 
 help: ## Affiche cette aide
 	@echo "Panio — cibles disponibles ($(ENV_FILE)) :"
@@ -24,7 +24,7 @@ help: ## Affiche cette aide
 check-env: ## Vérifie que le fichier d'environnement existe
 	@test -f $(ENV_FILE) || (echo "Fichier $(ENV_FILE) introuvable. Créez-le sur le serveur (voir README)." && exit 1)
 
-init: check-env jwt build up migrate cache-warm ## Premier déploiement (JWT + build + migrations)
+init: check-env build up migrate cache-warm ## Premier déploiement (build + migrations)
 	@echo "Init terminé. Vérifiez : make health"
 
 deploy: check-env pull build up migrate cache-warm ## Déploiement complet (git pull + build + migrations)
@@ -36,8 +36,8 @@ update: check-env build up migrate cache-warm ## Redéploie sans git pull
 pull: ## Récupère la dernière version Git
 	git pull --ff-only
 
-up: check-env ## Démarre les services
-	$(COMPOSE) up -d
+up: check-env ## Démarre les services (build les images locales si besoin)
+	$(COMPOSE) up -d --build
 
 down: check-env ## Arrête les services
 	$(COMPOSE) down
@@ -78,17 +78,6 @@ cache-warm: check-env ## Préchauffe le cache Symfony (prod)
 console: check-env ## Commande Symfony (ex. make console CMD="debug:router")
 	@test -n "$(CMD)" || (echo 'Usage: make console CMD="debug:router"' && exit 1)
 	$(COMPOSE) exec -T $(BACKEND) php bin/console $(CMD)
-
-jwt: check-env ## Génère les clés JWT (backend/config/jwt/)
-	@test -f backend/config/jwt/private.pem && echo "Clés JWT déjà présentes (make jwt-force pour regénérer)" && exit 0 || true
-	$(COMPOSE) run --rm --no-deps \
-		-v $(PWD)/backend/config/jwt:/var/www/html/config/jwt \
-		$(BACKEND) php bin/console lexik:jwt:generate-keypair --overwrite
-
-jwt-force: check-env ## Regénère les clés JWT (attention : invalide les tokens existants)
-	$(COMPOSE) run --rm --no-deps \
-		-v $(PWD)/backend/config/jwt:/var/www/html/config/jwt \
-		$(BACKEND) php bin/console lexik:jwt:generate-keypair --overwrite
 
 health: check-env ## Teste l'endpoint /api/health
 	@url=$$(grep '^BACKEND_URL=' $(ENV_FILE) | cut -d= -f2-); \

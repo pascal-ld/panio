@@ -1,5 +1,7 @@
 services:
   panio-backend:
+    image: panio-backend:latest
+    pull_policy: build
     restart: unless-stopped
     volumes:
       - panio_uploads:/var/www/html/public/uploads
@@ -15,6 +17,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     image: panio-frontend:latest
+    pull_policy: build
     restart: unless-stopped
     command: npm start
     labels:
