@@ -41,19 +41,24 @@ Les domaines et URLs sont définis dans `.env` à la racine. Le compose dev (`do
 
 ### Production
 
-```bash
-# Sur le serveur : copier et adapter .env.prod (domaine panio.app)
-docker compose --env-file .env.prod up -d --build
-```
+Deux fichiers, deux rôles :
 
-Fichiers concernés :
-- `.env.prod` — domaines, SMTP, mots de passe MariaDB (ne pas committer)
-- `docker-compose.prod.yml` — build frontend, HTTPS Traefik, volume uploads
+| Fichier | Rôle |
+|---------|------|
+| **`.env.prod`** (racine) | Docker : domaines, Traefik, MariaDB, build front |
+| **`backend/.env.prod`** | Symfony : surcharge de `backend/.env` (BDD, SMTP, secrets…) |
+
+```bash
+cp .env.prod.example .env.prod
+cp backend/.env.prod.example backend/.env.prod
+# éditer les deux, puis :
+make init
+```
 
 Avant le premier déploiement :
 1. DNS `panio.app` et `back.panio.app` → serveur
 2. Clés JWT dans `backend/config/jwt/`
-3. `MAILER_DSN` et mots de passe MariaDB renseignés dans `.env.prod`
+3. `.env.prod` + `backend/.env.prod` renseignés
 
 Services Docker : `panio-mariadb`, `panio-backend`, `panio-frontend` (+ `panio-mailpit`, `panio-phpmyadmin` en dev).
 

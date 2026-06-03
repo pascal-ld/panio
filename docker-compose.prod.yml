@@ -3,9 +3,12 @@ services:
     image: panio-backend:latest
     pull_policy: build
     restart: unless-stopped
+    environment: !reset
+      APP_ENV: prod
+    env_file: !reset []
     volumes:
       - panio_uploads:/var/www/html/public/uploads
-      # Lecture/écriture : génération des clés JWT depuis le conteneur (lexik:jwt:generate-keypair)
+      - ./backend/.env.prod:/var/www/html/.env.prod:ro
       - ./backend/config/jwt:/var/www/html/config/jwt
     labels:
       - traefik.http.routers.panio-back.tls=true

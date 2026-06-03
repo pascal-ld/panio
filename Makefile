@@ -1,12 +1,11 @@
 # Panio — commandes Docker (prod par défaut)
 #
-# Usage sur le VPS :
-#   Créez .env.prod sur le serveur (voir README), puis :
-#   make init                        # premier déploiement
-#   make deploy                      # après un git pull
+# Production (VPS) :
+#   cp .env.prod.example .env.prod && cp backend/.env.prod.example backend/.env.prod
+#   make init
 #
 # Dev local :
-#   make dev-up
+#   cp .env.example .env && make dev-up
 
 ENV_FILE ?= .env.prod
 COMPOSE  := docker compose --env-file $(ENV_FILE)
@@ -15,14 +14,15 @@ DB       := panio-mariadb
 
 .PHONY: help check-env init deploy update up rebuild down restart build pull ps logs \
         logs-backend logs-frontend logs-db migrate migrate-status cache-clear cache-warm \
-        console health shell-backend shell-db dev-up dev-down dev-logs
+        console health health-local shell-backend shell-db dev-up dev-down dev-logs
 
 help: ## Affiche cette aide
 	@echo "Panio — cibles disponibles ($(ENV_FILE)) :"
 	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
 check-env: ## Vérifie que le fichier d'environnement existe
-	@test -f $(ENV_FILE) || (echo "Fichier $(ENV_FILE) introuvable. Créez-le sur le serveur (voir README)." && exit 1)
+	@test -f $(ENV_FILE) || (echo "Fichier $(ENV_FILE) introuvable. Copiez .env.prod.example vers .env.prod" && exit 1)
+	@test -f backend/.env.prod || (echo "Fichier backend/.env.prod introuvable. Copiez backend/.env.prod.example" && exit 1)
 
 init: check-env build up migrate cache-warm ## Premier déploiement (build + migrations)
 	@echo "Init terminé. Vérifiez : make health"
@@ -83,11 +83,17 @@ console: check-env ## Commande Symfony (ex. make console CMD="debug:router")
 	@test -n "$(CMD)" || (echo 'Usage: make console CMD="debug:router"' && exit 1)
 	$(COMPOSE) exec -T $(BACKEND) php bin/console $(CMD)
 
-health: check-env ## Teste l'endpoint /api/health
-	@url=$$(grep '^BACKEND_URL=' $(ENV_FILE) | cut -d= -f2-); \
+health: check-env ## Teste /api/health via Traefik (BACKEND_URL dans .env.prod)
+	@url=$$(grep '^BACKEND_URL=' $(ENV_FILE) | sed 's/^BACKEND_URL=//' | tr -d '\r"' | xargs); \
 	test -n "$$url" || (echo "BACKEND_URL introuvable dans $(ENV_FILE)" && exit 1); \
+	case "$$url" in http://*|https://*) ;; *) url="https://$$url" ;; esac; \
+	url=$${url%/}; \
 	echo "GET $$url/api/health"; \
 	curl -fsS "$$url/api/health" && echo
+
+health-local: check-env ## Teste /api/health dans le conteneur backend (sans Traefik)
+	@echo "GET http://localhost/api/health (dans panio-backend)"
+	@$(COMPOSE) exec -T $(BACKEND) curl -fsS http://localhost/api/health && echo
 
 shell-backend: check-env ## Shell dans le conteneur backend
 	$(COMPOSE) exec $(BACKEND) bash

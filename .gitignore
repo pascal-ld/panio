@@ -8,6 +8,7 @@
 .env.prod
 .env.local
 .env.*.local
+/backend/.env.prod
 /backend/.env.local
 /backend/.env.local.php
 /backend/.env.*.local.php

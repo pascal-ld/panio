@@ -29,8 +29,8 @@ services:
       JWT_TOKEN_TTL: ${JWT_TOKEN_TTL:-2592000}
       MAILER_DSN: ${MAILER_DSN}
       MAILER_FROM: ${MAILER_FROM}
-      APP_FRONTEND_URL: ${FRONTEND_URL}
-      APP_BACKEND_URL: ${BACKEND_URL}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-${FRONTEND_URL}}
+      APP_BACKEND_URL: ${APP_BACKEND_URL:-${BACKEND_URL}}
     depends_on:
       panio-mariadb:
         condition: service_healthy
