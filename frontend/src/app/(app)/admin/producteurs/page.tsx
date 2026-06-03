@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { PageLoader } from "@/components/ui/PageLoader";
 import {
   createAdminProducer,
@@ -44,16 +44,16 @@ export default function AdminProducersPage() {
   const [saving, setSaving] = useState(false);
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
-  async function loadProducers(search = query) {
+  const loadProducers = useCallback(async (search: string) => {
     const list = await fetchAdminProducers(search);
     setProducers(list);
-  }
+  }, []);
 
   useEffect(() => {
-    loadProducers()
+    loadProducers("")
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [loadProducers]);
 
   function openCreateForm() {
     setEditingId(null);

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ClientGuard } from "@/components/auth/ClientGuard";
@@ -99,21 +98,6 @@ export default function ProducteurPage() {
     if (!selectedSlotKey) return null;
     return slotEntries.find((e) => e.key === selectedSlotKey)?.slot ?? null;
   }, [slotEntries, selectedSlotKey]);
-
-  const sortedProducts = useMemo(() => {
-    if (!shop) return [];
-
-    return [...shop.products].sort((a, b) => {
-      const categoryA = a.category?.name?.trim() || "\uffff";
-      const categoryB = b.category?.name?.trim() || "\uffff";
-      const byCategory = categoryA.localeCompare(categoryB, "fr", { sensitivity: "base" });
-      if (byCategory !== 0) {
-        return byCategory;
-      }
-
-      return a.name.localeCompare(b.name, "fr", { sensitivity: "base" });
-    });
-  }, [shop]);
 
   const loadActiveOrder = useCallback(async () => {
     if (!slug || !selectedSlot) return;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { PageLoader } from "@/components/ui/PageLoader";
 import {
   createAdminUser,
@@ -61,16 +61,16 @@ export default function AdminUsersPage() {
   const [togglingId, setTogglingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  async function loadUsers(search = query, role = roleFilter) {
+  const loadUsers = useCallback(async (search: string, role: string) => {
     const list = await fetchAdminUsers(search, role);
     setUsers(list);
-  }
+  }, []);
 
   useEffect(() => {
-    loadUsers()
+    loadUsers("", "")
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [loadUsers]);
 
   function openCreateForm() {
     setEditingId(null);

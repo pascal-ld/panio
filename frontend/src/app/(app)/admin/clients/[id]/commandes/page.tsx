@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PageLoader } from "@/components/ui/PageLoader";
 import {
   fetchAdminClientOrders,
@@ -16,8 +16,6 @@ const inputClass =
   "rounded-xl border border-primary/20 bg-white px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20";
 const buttonPrimaryClass =
   "rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary-light disabled:opacity-50";
-const buttonSecondaryClass =
-  "rounded-xl border border-primary/20 px-4 py-2 text-sm font-medium text-foreground/70 transition hover:bg-accent";
 
 const statusOptions: { value: AdminOrderStatus; label: string }[] = [
   { value: "draft", label: "Brouillon" },
@@ -40,7 +38,7 @@ export default function AdminClientOrdersPage() {
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [pendingStatus, setPendingStatus] = useState<Record<number, AdminOrderStatus>>({});
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     const data = await fetchAdminClientOrders(clientId);
     setClientName(data.client.fullName ?? data.client.email);
     setClientEmail(data.client.email);
@@ -48,7 +46,7 @@ export default function AdminClientOrdersPage() {
     setPendingStatus(
       Object.fromEntries(data.orders.map((order) => [order.id, order.status as AdminOrderStatus])),
     );
-  }
+  }, [clientId]);
 
   useEffect(() => {
     if (!Number.isFinite(clientId)) {
@@ -60,7 +58,7 @@ export default function AdminClientOrdersPage() {
     loadOrders()
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [clientId]);
+  }, [clientId, loadOrders]);
 
   async function handleStatusChange(orderId: number) {
     const status = pendingStatus[orderId];

@@ -239,7 +239,7 @@ export function ProductForm({ product }: ProductFormProps) {
           placeholder="Optionnel (ex. 20)"
         />
         <span className="mt-1 block text-xs text-foreground/50">
-          Cette limite s'applique uniquement au prochain créneau. Laissez vide pour ne pas limiter.
+          Cette limite s&apos;applique uniquement au prochain créneau. Laissez vide pour ne pas limiter.
         </span>
       </label>
 
