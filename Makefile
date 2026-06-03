@@ -89,7 +89,7 @@ health: check-env ## Teste /api/health via Traefik (BACKEND_URL dans .env.prod)
 	case "$$url" in http://*|https://*) ;; *) url="https://$$url" ;; esac; \
 	url=$${url%/}; \
 	echo "GET $$url/api/health"; \
-	curl -fsS "$$url/api/health" && echo
+	curl -fsS -k "$$url/api/health" && echo
 
 health-local: check-env ## Teste /api/health dans le conteneur backend (sans Traefik)
 	@echo "GET http://localhost/api/health (dans panio-backend)"

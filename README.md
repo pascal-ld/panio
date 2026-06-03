@@ -56,13 +56,29 @@ make init
 ```
 
 Avant le premier déploiement :
-1. DNS `panio.app` et `back.panio.app` → serveur
+1. DNS `panio.app` et `api.panio.app` → serveur
 2. Clés JWT dans `backend/config/jwt/`
 3. `.env.prod` + `backend/.env.prod` renseignés
 
 Services Docker : `panio-mariadb`, `panio-backend`, `panio-frontend` (+ `panio-mailpit`, `panio-phpmyadmin` en dev).
 
 ## Backend (Symfony)
+
+### Premier super admin (prod, une fois)
+
+```bash
+make shell-backend
+php bin/console app:user:create admin@example.com 'VotreMotDePasse12!' --role=super_admin --full-name="Admin Panio"
+exit
+```
+
+Mot de passe : 12 caractères minimum, 1 chiffre, 1 caractère spécial. Connexion sur https://panio.app/login puis espace `/admin`.
+
+Les comptes suivants se créent depuis l’interface admin (invitation par e-mail) ou avec `--invite` :
+
+```bash
+php bin/console app:user:create client@example.com x --role=client --invite
+```
 
 ```bash
 cd backend
