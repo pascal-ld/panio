@@ -13,7 +13,7 @@ COMPOSE  := docker compose --env-file $(ENV_FILE)
 BACKEND  := panio-backend
 DB       := panio-mariadb
 
-.PHONY: help check-env init deploy update up down restart build pull ps logs \
+.PHONY: help check-env init deploy update up rebuild down restart build pull ps logs \
         logs-backend logs-frontend logs-db migrate migrate-status cache-clear cache-warm \
         console health shell-backend shell-db dev-up dev-down dev-logs
 
@@ -36,8 +36,12 @@ update: check-env build up migrate cache-warm ## Redéploie sans git pull
 pull: ## Récupère la dernière version Git
 	git pull --ff-only
 
-up: check-env ## Démarre les services (build les images locales si besoin)
-	$(COMPOSE) up -d --build
+up: check-env ## Démarre les services (build + recrée les conteneurs app)
+	$(COMPOSE) up -d --build --force-recreate $(BACKEND) panio-frontend
+
+rebuild: check-env ## Rebuild sans cache + recréation (après git pull ou si le build semble obsolète)
+	$(COMPOSE) build --no-cache
+	$(COMPOSE) up -d --force-recreate $(BACKEND) panio-frontend
 
 down: check-env ## Arrête les services
 	$(COMPOSE) down

@@ -264,7 +264,7 @@ export default function ProducteurSettingsPage() {
               />
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <ProducerPhoto photoUrl={null} size={64} />
+                <ProducerPhoto photoPath={producerPhotoPath} size={64} />
                 <span className="text-center text-sm text-foreground/55">
                   JPEG, PNG ou WebP — max. 10 Mo
                 </span>
