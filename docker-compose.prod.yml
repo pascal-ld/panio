@@ -5,7 +5,8 @@ services:
     restart: unless-stopped
     volumes:
       - panio_uploads:/var/www/html/public/uploads
-      - ./backend/config/jwt:/var/www/html/config/jwt:ro
+      # Lecture/écriture : génération des clés JWT depuis le conteneur (lexik:jwt:generate-keypair)
+      - ./backend/config/jwt:/var/www/html/config/jwt
     labels:
       - traefik.http.routers.panio-back.tls=true
       - traefik.http.routers.panio-back.tls.certresolver=${TRAEFIK_CERT_RESOLVER}
